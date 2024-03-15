@@ -1,0 +1,13 @@
+/.vs
+/Debug
+/Release
+/x64
+
+*.vcxproj.user
+*.iobj
+*.ipdb
+*.exp
+*.lib
+*.exe
+*.so
+*.jar
