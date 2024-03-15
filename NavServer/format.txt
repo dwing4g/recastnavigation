@@ -1,0 +1,83 @@
+server/map/map.rcmodeldata (含多个动态模型的collider box/mesh数据文件,坐标基于模型中心点)
+int32 版本号(当前为1)
+int32 模型数量(n)
+{
+  int32 模型数据的文件偏移(见下面注释)
+  int32 模型数据的大小(见下面注释)
+} * n
+{
+  int32 模型路径文件名长度(s),一定是4的倍数
+  uint8[s] 模型路径及文件名字符串(UTF-8编码,结尾填充\0)
+} * n
+// 模型数据的开始(偏移位置)
+{
+  int32 collider数量(c)
+  {
+    int32 顶点数量(v) -1表示顶点数量为8且使用常量的box模型索引(此时没有三角形数量及顶点索引数组)
+    int32 三角形数量(t)
+    {
+      float x
+      float y
+      float z
+    } * v 顶点坐标数组
+    {
+      int32 index1
+      int32 index2
+      int32 index3
+    } * t 三角形顶点索引数组
+  } * c
+} * n
+// 模型数据的结束(大小=结束-开始)
+
+
+server/map/mapNNNN/NNNN.rcnavinput (整个地图多个静态模型的collider box/mesh数据文件,坐标基于地图中心点)
+int32 版本号(当前为1)
+int32 模型数量(n)
+{
+  int32 模型数据的文件偏移(见下面注释)
+  uint8 模型基于tile坐标的最小x坐标
+  uint8 模型基于tile坐标的最小z坐标
+  uint8 模型基于tile坐标的最大x坐标
+  uint8 模型基于tile坐标的最大z坐标
+} * n
+rcConfig recast配置数据(92字节)
+{
+  int32 buildParamSize     构建参数结构体的字节大小(包括此字段),用于兼容后续扩展
+  float agentRadius        移动单位的半径(米) 默认: 0.25
+  float agentHeight        移动单位的高度(米) 默认: 2.0
+  float agentMaxClimb      移动单位移动高度差最大值(米) 默认: 0.6
+  float jumpNearDistance   小桥最大距离(米) 默认: 2.0
+  float jumpMediumDistance 中桥最大距离(米) 默认: 4.0
+  float jumpFarDistance    大桥最大距离(米) 默认: 6.0
+  float waterAreaMaxHeight 可移动的水域最大深度(米) 默认: 0.7
+  float roadAreaMinWeight  道路区域判定最小权重 默认: 0.8
+  // 这里可后续扩展,但不能修改前面的字段
+}
+// 这里也可以后续插入暂未定义的数据,不影响下面结构的解析
+// 模型数据的开始(偏移位置) 此部分与rcmodeldata中每个collider中的格式相同
+{
+  int32 顶点数量(v) -1表示顶点数量为8且使用常量的box模型索引(此时没有三角形数量及顶点索引数组)
+  int32 三角形数量(t)
+  {
+    float x
+    float y
+    float z
+  } * v 顶点坐标数组
+  {
+    int32 index1
+    int32 index2
+    int32 index3
+  } * t 三角形顶点索引数组
+  int32 RecastColliderType(0/1/2:None/NPC/Plant)
+} * n
+
+
+server/map/mapNNNN/NNNN.rcnavmesh (整个地图以tile为单位的navmesh数据文件)
+int32 版本号(当前为1)
+rcConfig recast配置数据(92字节) 应该跟对应rcnavinput中的rcConfig保持一致,可读出tile的宽高数量(x,z)
+{
+  {
+    int32 navmesh数据大小(n)
+    uint8[n] navmesh数据(可读出其中的xz坐标)
+  } * x
+} * z
