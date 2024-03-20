@@ -96,7 +96,7 @@
       <Filter>Recast\Source</Filter>
     </ClCompile>
     <ClCompile Include="NavServer.cpp" />
-    <ClCompile Include="..\NavMeshUpdate\main.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Detour">
