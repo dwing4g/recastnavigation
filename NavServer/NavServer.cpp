@@ -494,7 +494,7 @@ extern "C" void navFreeNavMesh(dtNavMeshEx* navMesh)
     dtFree(navMesh);
 }
 
-void customMarkHeightfield(rcHeightfield& hf, const BuildParam& bp, const BHMapConfig* waterCfg, const BHMapConfig* roadCfg)
+static void customMarkHeightfield(rcHeightfield& hf, const BuildParam& bp, const BHMapConfig* waterCfg, const BHMapConfig* roadCfg)
 {
     const int w = hf.width;
     const int h = hf.height;
@@ -578,7 +578,7 @@ void customMarkHeightfield(rcHeightfield& hf, const BuildParam& bp, const BHMapC
     }
 }
 
-NavStatus createNavMesh(const rcConfig& cfg, const BuildParam& bp, rcContext* rcCtx, const rcPolyMesh* pmesh, const rcPolyMeshDetail* dmesh,
+static NavStatus createNavMesh(const rcConfig& cfg, const BuildParam& bp, rcContext* rcCtx, const rcPolyMesh* pmesh, const rcPolyMeshDetail* dmesh,
     const std::vector<OffMeshLink>& offMeshLinks, int tileX, int tileZ, unsigned char** outNavTileData, int* outNavTileDataSize)
 {
     if (!pmesh || !dmesh)
