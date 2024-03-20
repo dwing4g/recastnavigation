@@ -526,3 +526,23 @@ extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativ
     const NavStatus s = navCheckArcCollision(reinterpret_cast<const dtNavMeshQueryEx*>(navQuery), cx, cz, r, x0, z0, x1, z1);
     return static_cast<jlong>(s);
 }
+
+// public static native long nativeBuildNavMesh(long navMeshCreateParams, int[] navMeshDataSize);
+extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeBuildNavMesh
+    (JNIEnv* const jenv, jclass, jlong navMeshCreateParams, jintArray navMeshDataSize)
+{
+    if (navMeshCreateParams <= 0)
+        return -101;
+    if (!navMeshDataSize)
+        return -102;
+    if (jenv->GetArrayLength(navMeshDataSize) < 1)
+        return -103;
+
+    unsigned char* navData;
+    int navDataSize;
+    const NavStatus s = navBuildNavMesh(reinterpret_cast<dtNavMeshCreateParams*>(navMeshCreateParams), &navData, &navDataSize);
+    if (s)
+        return static_cast<jlong>(s);
+    jenv->SetIntArrayRegion(navMeshDataSize, 0, 1, reinterpret_cast<jint*>(&navDataSize));
+    return reinterpret_cast<jlong>(navData);
+}
