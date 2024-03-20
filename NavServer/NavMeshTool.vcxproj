@@ -166,11 +166,6 @@
     <ClCompile Include="..\Detour\Source\DetourNavMeshBuilder.cpp" />
     <ClCompile Include="..\Detour\Source\DetourNavMeshQuery.cpp" />
     <ClCompile Include="..\Detour\Source\DetourNode.cpp" />
-    <ClCompile Include="..\NavMeshUpdate\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-mimalloc|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\Recast\Source\Recast.cpp" />
     <ClCompile Include="..\Recast\Source\RecastAlloc.cpp" />
     <ClCompile Include="..\Recast\Source\RecastArea.cpp" />
@@ -182,6 +177,7 @@
     <ClCompile Include="..\Recast\Source\RecastMeshDetail.cpp" />
     <ClCompile Include="..\Recast\Source\RecastRasterization.cpp" />
     <ClCompile Include="..\Recast\Source\RecastRegion.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="NavServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
