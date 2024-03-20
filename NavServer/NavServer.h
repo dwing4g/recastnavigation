@@ -20,6 +20,7 @@ struct NavFieldCtx;
 typedef char bool;
 #endif
 struct dtMeshTile;
+struct dtNavMeshCreateParams;
 
 typedef int64_t NavStatus;
 
@@ -282,6 +283,8 @@ typedef struct DebugParam
 
 /// 输入地图资源根目录(ark_resource/resource/develop/server)及地图ID构建整个NavMesh并保存. 路径字符串编码只支持本地编码
 NavStatus navBuildAllNavMesh(const char* path, int mapId, const DebugParam* debugParam);
+
+NavStatus navBuildNavMesh(dtNavMeshCreateParams* params, unsigned char** outNavMeshData, int* outNavMeshDataSize);
 
 #ifdef __cplusplus
 }
