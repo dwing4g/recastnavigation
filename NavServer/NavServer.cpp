@@ -3297,6 +3297,20 @@ extern "C" NavStatus navBuildAllNavMesh(const char* path, int mapId, const Debug
     return 0;
 }
 
+extern "C" NavStatus navBuildNavMesh(dtNavMeshCreateParams* params, unsigned char** outNavMeshData, int* outNavMeshDataSize)
+{
+    if (!params)
+        return -1;
+    if (!outNavMeshData)
+        return -2;
+    if (!outNavMeshDataSize)
+        return -3;
+    const bool r = dtCreateNavMeshData(params, outNavMeshData, outNavMeshDataSize);
+    if (!r)
+        return -4;
+    return 0;
+}
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
