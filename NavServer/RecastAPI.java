@@ -339,14 +339,15 @@ public final class RecastAPI {
 			String tmpPath = System.getProperty("java.io.tmpdir");
 			try {
 				long crc = -1;
-				String filePath = null;
+				String fileName = null, filePath = null;
 				Enumeration<URL> urls = classLoader.getResources(nativeLibName);
 				URLConnection urlConn = urls.hasMoreElements() ? urls.nextElement().openConnection() : null;
 				if (urlConn instanceof JarURLConnection) {
 					JarEntry je = ((JarURLConnection)urlConn).getJarEntry();
 					if (je != null) {
 						crc = je.getCrc() & 0xffff_ffffL;
-						filePath = String.format("%s/%08x_%s", tmpPath, crc, nativeLibName);
+						fileName = String.format("%08x_%s", crc, nativeLibName);
+						filePath = tmpPath + File.separatorChar + fileName;
 						file = new File(filePath);
 						if (file.length() == je.getSize())
 							urlConn = null;
@@ -358,13 +359,14 @@ public final class RecastAPI {
 						if (crc < 0) {
 							CRC32 crc32 = new CRC32();
 							crc32.update(data, 0, data.length);
-							filePath = String.format("%s/%08x_%s", tmpPath, crc32.getValue(), nativeLibName);
+							fileName = String.format("%08x_%s", crc32.getValue(), nativeLibName);
+							filePath = tmpPath + File.separatorChar + fileName;
 							file = new File(filePath);
 							if (file.length() == data.length)
 								data = null;
 						}
 						if (data != null) {
-							Path tmpFilePath = Files.createTempFile(filePath, ".tmp");
+							Path tmpFilePath = Files.createTempFile(fileName, ".tmp");
 							Files.write(tmpFilePath, data, StandardOpenOption.CREATE,
 									StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 							Files.move(tmpFilePath, Paths.get(filePath),
