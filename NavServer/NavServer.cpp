@@ -489,7 +489,8 @@ extern "C" NavStatus navForkNavMesh(const dtNavMeshEx* navMesh, dtNavMeshEx** ou
 
 extern "C" void navFreeNavMesh(dtNavMeshEx* navMesh)
 {
-    if (!navMesh) return;
+    if (!navMesh)
+        return;
     navMesh->~dtNavMeshEx();
     dtFree(navMesh);
 }
@@ -3309,6 +3310,35 @@ extern "C" NavStatus navBuildNavMesh(dtNavMeshCreateParams* params, unsigned cha
     if (!r)
         return -4;
     return 0;
+}
+
+extern "C" NavStatus navCreateNavMesh(const dtNavMeshParams* params, dtNavMesh** outNavMesh)
+{
+    if (!params)
+        return -1;
+    if (!outNavMesh)
+        return -2;
+    void* const mem = dtAlloc(sizeof(dtNavMesh), DT_ALLOC_PERM);
+    if (!mem)
+        return -3;
+    dtNavMesh* const navMesh = new(mem) dtNavMesh;
+    dtStatus s = navMesh->init(params);
+    if (dtStatusFailed(s))
+    {
+        navMesh->~dtNavMesh();
+        dtFree(navMesh);
+        return NAVSTATUS_HIGH_BIT | s;
+    }
+    *outNavMesh = navMesh;
+    return 0;
+}
+
+extern "C" void navDestroyNavMesh(dtNavMesh* navMesh)
+{
+    if (!navMesh)
+        return;
+    navMesh->~dtNavMesh();
+    dtFree(navMesh);
 }
 
 #ifdef _MSC_VER
