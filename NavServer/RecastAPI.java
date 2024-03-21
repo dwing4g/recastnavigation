@@ -338,6 +338,15 @@ public final class RecastAPI {
 	 */
 	public static native void nativeDestroyNavMesh(long navMesh);
 
+	/**
+	 * 保存指定navMesh数据到指定文件中
+	 *
+	 * @param navMesh  通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
+	 * @param filename 输出文件名
+	 * @return 保存tile的数量. >=0表示保存成功, <0表示保存失败
+	 */
+	public static native long nativeDumpNavMesh(long navMesh, String filename);
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	static {

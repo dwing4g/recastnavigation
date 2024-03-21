@@ -482,7 +482,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeRandomP
 }
 
 // public static native long nativeSaveNavMesh(long navMesh, String filename);
-extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeSaveNavMesh(JNIEnv* const jenv, jclass, jlong navMesh, jstring filename)
+extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeSaveNavMesh
+    (JNIEnv* const jenv, jclass, jlong navMesh, jstring filename)
 {
     if (navMesh <= 0)
         return -101;
@@ -548,8 +549,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeBuildNa
 }
 
 // public static native long nativeCreateNavMesh(long navMeshParams);
-extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeCreateNavMesh
-    (JNIEnv*, jclass, jlong navMeshParams)
+extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeCreateNavMesh(JNIEnv*, jclass, jlong navMeshParams)
 {
     if (navMeshParams <= 0)
         return -101;
@@ -559,8 +559,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeCreateN
         return static_cast<jlong>(s);
     return reinterpret_cast<jlong>(navMesh);
 }
-extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativeCreateNavMesh
-    (jlong navMeshParams)
+extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativeCreateNavMesh(jlong navMeshParams)
 {
     if (navMeshParams <= 0)
         return -101;
@@ -572,15 +571,42 @@ extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativ
 }
 
 // public static native void nativeDestroyNavMesh(long navMesh);
-extern "C" JNIEXPORT void JNICALL Java_recastnavigation_RecastAPI_nativeDestroyNavMesh
-    (JNIEnv*, jclass, jlong navMesh)
+extern "C" JNIEXPORT void JNICALL Java_recastnavigation_RecastAPI_nativeDestroyNavMesh(JNIEnv*, jclass, jlong navMesh)
 {
     if (navMesh > 0)
         navDestroyNavMesh(reinterpret_cast<dtNavMesh*>(navMesh));
 }
-extern "C" JNIEXPORT void JNICALL JavaCritical_recastnavigation_RecastAPI_nativeDestroyNavMesh
-    (jlong navMesh)
+extern "C" JNIEXPORT void JNICALL JavaCritical_recastnavigation_RecastAPI_nativeDestroyNavMesh(jlong navMesh)
 {
     if (navMesh > 0)
         navDestroyNavMesh(reinterpret_cast<dtNavMesh*>(navMesh));
+}
+
+// public static native long nativeDumpNavMesh(long navMesh, String filename);
+extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeDumpNavMesh
+    (JNIEnv* const jenv, jclass, jlong navMesh, jstring filename)
+{
+    if (navMesh <= 0)
+        return -101;
+    if (!filename)
+        return -102;
+#ifdef _WIN32
+    const jchar* const pfn = jenv->GetStringChars(filename, 0);
+    if (!pfn)
+        return -103;
+    FILE* const fp = _wfopen(reinterpret_cast<const wchar_t*>(pfn), L"wb");
+    jenv->ReleaseStringChars(filename, pfn);
+#else
+    const char* const pfn = jenv->GetStringUTFChars(filename, 0);
+    if (!pfn)
+        return -103;
+    FILE* const fp = fopen(pfn, "wb");
+    jenv->ReleaseStringUTFChars(filename, pfn);
+#endif
+    if (!fp)
+        return -104;
+
+    const NavStatus s = navDumpNavMesh(reinterpret_cast<const dtNavMesh*>(navMesh), fp);
+    fclose(fp);
+    return static_cast<jlong>(s);
 }
