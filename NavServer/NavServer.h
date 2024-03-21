@@ -8,11 +8,13 @@
 
 #ifdef __cplusplus
 extern "C" {
+class dtNavMesh;
 class dtNavMeshEx;
 class dtNavMeshQueryEx;
 class rcContext;
 class NavFieldCtx;
 #else
+struct dtNavMesh;
 struct dtNavMeshEx;
 struct dtNavMeshQueryEx;
 struct rcContext;
@@ -147,14 +149,14 @@ void navBuildTileEnd(dtNavMeshEx* navMesh, int tileX, int tileZ);
 ///                    成功后所有权交给navMesh,调用者不能自行释放,navMesh释放时会自动释放所有的tile数据,被替换掉的tile数据也会自动释放
 /// @param navTileDataSize navTileData指向的数据字节大小
 /// @return 替换结果的状态. 0表示成功; <0表示失败
-NavStatus navReplaceTile(dtNavMeshEx* navMesh, unsigned char* navTileData, int navTileDataSize);
+NavStatus navReplaceTile(dtNavMesh* navMesh, unsigned char* navTileData, int navTileDataSize);
 
 /// 移除navMesh中的某个tile的导航网格数据. 对navMesh是写操作(读读并发,读写和写写不能并发)
 /// @param navMesh 通过navLoadNavMesh或navForkNavMesh得到的有效指针
 /// @param tileX tile的X坐标
 /// @param tileZ tile的Z坐标
 /// @return 移除结果的状态. 0表示移除成功; 1表示未找到该tile数据; <0表示失败
-NavStatus navRemoveTile(dtNavMeshEx* navMesh, int tileX, int tileZ);
+NavStatus navRemoveTile(dtNavMesh* navMesh, int tileX, int tileZ);
 
 /// 修正navMesh中某个tile的不正常poly的flags为0. 对navMesh是写操作(读读并发,读写和写写不能并发)
 /// @param navMesh 通过navLoadNavMesh或navForkNavMesh得到的有效指针
@@ -170,14 +172,14 @@ NavStatus navFixTile(const dtNavMeshEx* navMesh, const void* buildParam, int til
 /// @param tileZ tile的Z坐标
 /// @param tilePtr 输出tile的内部数据结构指针(dtMeshTile). 仅在移除该tile或整个navMesh之前有效
 /// @return 获取结果的状态. 0表示获取成功; <0表示失败
-NavStatus navGetTileData(const dtNavMeshEx* navMesh, int tileX, int tileZ, const dtMeshTile** tilePtr);
+NavStatus navGetTileData(const dtNavMesh* navMesh, int tileX, int tileZ, const dtMeshTile** tilePtr);
 
 /// 分配绑定某个navMesh的dtNavMeshQueryEx结构指针. 此方法是线程安全的,但获得的指针后续不能并发访问
 /// @param navMesh 通过navLoadNavMesh或navForkNavMesh得到的有效指针
 /// @param maxNodes 最大的搜索节点数量. 必须在(0,65535]的范围内
 /// @param outNavQuery 输出dtNavMeshQueryEx结构的指针
 /// @return 分配结果的状态. 0表示成功; <0表示失败
-NavStatus navAllocNavQuery(const dtNavMeshEx* navMesh, int maxNodes, dtNavMeshQueryEx** outNavQuery);
+NavStatus navAllocNavQuery(const dtNavMesh* navMesh, int maxNodes, dtNavMeshQueryEx** outNavQuery);
 
 /// 释放某个dtNavMeshQueryEx结构指针
 /// @param navQuery 通过navAllocNavQuery得到的dtNavMeshQueryEx结构的指针
@@ -284,6 +286,11 @@ typedef struct DebugParam
 /// 输入地图资源根目录(ark_resource/resource/develop/server)及地图ID构建整个NavMesh并保存. 路径字符串编码只支持本地编码
 NavStatus navBuildAllNavMesh(const char* path, int mapId, const DebugParam* debugParam);
 
+/// 根据dtNavMeshCreateParams中的数据构建NavMesh数据
+/// @param navMeshCreateParams 传入指向dtNavMeshCreateParams数据的指针
+/// @param outNavMeshData 输出构建结果的NavMesh数据指针,只有构建成功时有效
+/// @param navMeshDataSize 长度至少为1,索引0的位置输出构建结果的NavMesh数据字节大小,只有构建成功时有效
+/// @return 构建结果的状态. 0表示构建成功, <0表示构建失败
 NavStatus navBuildNavMesh(dtNavMeshCreateParams* params, unsigned char** outNavMeshData, int* outNavMeshDataSize);
 
 #ifdef __cplusplus
