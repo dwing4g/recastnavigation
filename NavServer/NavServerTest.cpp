@@ -52,7 +52,7 @@ void printCenterPos(const dtNavMesh& navMesh, dtPolyRef polyRef)
     cx /= poly->vertCount;
     cz /= poly->vertCount;
     const dtPolyRef baseRef = navMesh.getPolyRefBase(tile);
-    printf("%9.3f,%9.3f,%9.3f, tile:%2d,%2d, poly:%d", cx, cy, cz, tile->header->x, tile->header->y, polyRef - baseRef);
+    printf("%9.3f,%9.3f,%9.3f, tile:%2d,%2d, poly:%lld", cx, cy, cz, tile->header->x, tile->header->y, (long long)(polyRef - baseRef));
 }
 
 void markPoly(const dtNavMesh& navMesh, dtPolyRef polyRef, std::unordered_set<dtPolyRef>& markedPolyRefs)
