@@ -31,7 +31,7 @@ NavServerJNI.cpp
 set TEST_FILES=^
 NavServerTest.cpp
 
-set COMPILE=-std=c++11 -DNDEBUG -D__USE_MINGW_ANSI_STDIO=1 -I. -I..\Detour\Include -I..\Recast\Include -I%JAVA_HOME%\include -I%JAVA_HOME%\include\win32 -O3 -pipe -static -Wall
+set COMPILE=-std=c++11 -DDT_POLYREF64=1 -DNDEBUG -D__USE_MINGW_ANSI_STDIO=1 -I. -I..\Detour\Include -I..\Recast\Include -I%JAVA_HOME%\include -I%JAVA_HOME%\include\win32 -O3 -pipe -static -Wall
 
 rem set COMPILE32=i686-w64-mingw32-g++.exe -m32 -march=i686 %COMPILE% -Wl,--enable-stdcall-fixup
 set COMPILE64=x86_64-w64-mingw32-g++.exe -m64 %COMPILE%
