@@ -125,7 +125,7 @@ public final class RecastAPI {
 	/**
 	 * 替换navMesh中的某个tile的导航网格数据. 对navMesh是写操作(读读并发,读写和写写不能并发)
 	 *
-	 * @param navMesh         通过nativeLoadNavMesh或nativeForkNavMesh得到的有效指针
+	 * @param navMesh         通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
 	 * @param navTileData     通过nativeBuildTile或nativeAlloc(需要填充之前nativeBuildTile得到的数据)得到的tile数据指针.
 	 *                        成功后所有权交给navMesh,调用者不能自行释放,navMesh释放时会自动释放所有的tile数据,被替换掉的tile数据也会自动释放
 	 * @param navTileDataSize navTileData指向的数据字节大小
@@ -136,7 +136,7 @@ public final class RecastAPI {
 	/**
 	 * 移除navMesh中的某个tile的导航网格数据. 对navMesh是写操作(读读并发,读写和写写不能并发)
 	 *
-	 * @param navMesh 通过nativeLoadNavMesh或nativeForkNavMesh得到的有效指针
+	 * @param navMesh 通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
 	 * @param tileX   tile的X坐标
 	 * @param tileZ   tile的Z坐标
 	 * @return 0表示移除成功; 1表示未找到该tile数据; <0表示失败
@@ -157,7 +157,7 @@ public final class RecastAPI {
 	/**
 	 * 获取navMesh中的某个tile的导航网格数据. 对navMesh是读操作(读读并发,读写和写写不能并发)
 	 *
-	 * @param navMesh 通过nativeLoadNavMesh或nativeForkNavMesh得到的有效指针
+	 * @param navMesh 通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
 	 * @param tileX   tile的X坐标
 	 * @param tileZ   tile的Z坐标
 	 * @return tile的内部数据结构指针(dtMeshTile). 仅在移除该tile或整个navMesh之前有效; <=0表示失败
@@ -167,7 +167,7 @@ public final class RecastAPI {
 	/**
 	 * 分配绑定某个navMesh的navQuery指针. 此方法是线程安全的,但获得的指针后续不能并发访问
 	 *
-	 * @param navMesh  通过nativeLoadNavMesh或nativeForkNavMesh得到的有效指针
+	 * @param navMesh  通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
 	 * @param maxNodes 最大的搜索节点数量. 必须在(0,65535]的范围内
 	 * @return dtNavMeshQueryEx结构的指针, <=0表示失败
 	 */
@@ -322,6 +322,21 @@ public final class RecastAPI {
 	 * @return 构建结果的NavMesh数据指针. <0表示失败, 0表示构建出空数据
 	 */
 	public static native long nativeBuildNavMesh(long navMeshCreateParams, int[] navMeshDataSize);
+
+	/**
+	 * 根据dtNavMeshParams中的配置创建一个空的dtNavMesh
+	 *
+	 * @param navMeshParams 传入指向dtNavMeshParams数据的指针
+	 * @return 输出创建的dtNavMesh指针. <0表示创建失败
+	 */
+	public static native long nativeCreateNavMesh(long navMeshParams);
+
+	/**
+	 * 释放nativeCreateNavMesh创建的dtNavMesh
+	 *
+	 * @param navMesh 传入有效的dtNavMesh指针
+	 */
+	public static native void nativeDestroyNavMesh(long navMesh);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

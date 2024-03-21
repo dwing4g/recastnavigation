@@ -546,3 +546,41 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeBuildNa
     jenv->SetIntArrayRegion(navMeshDataSize, 0, 1, reinterpret_cast<jint*>(&navDataSize));
     return reinterpret_cast<jlong>(navData);
 }
+
+// public static native long nativeCreateNavMesh(long navMeshParams);
+extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeCreateNavMesh
+    (JNIEnv*, jclass, jlong navMeshParams)
+{
+    if (navMeshParams <= 0)
+        return -101;
+    dtNavMesh* navMesh;
+    const NavStatus s = navCreateNavMesh(reinterpret_cast<dtNavMeshParams*>(navMeshParams), &navMesh);
+    if (s)
+        return static_cast<jlong>(s);
+    return reinterpret_cast<jlong>(navMesh);
+}
+extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativeCreateNavMesh
+    (jlong navMeshParams)
+{
+    if (navMeshParams <= 0)
+        return -101;
+    dtNavMesh* navMesh;
+    const NavStatus s = navCreateNavMesh(reinterpret_cast<dtNavMeshParams*>(navMeshParams), &navMesh);
+    if (s)
+        return static_cast<jlong>(s);
+    return reinterpret_cast<jlong>(navMesh);
+}
+
+// public static native void nativeDestroyNavMesh(long navMesh);
+extern "C" JNIEXPORT void JNICALL Java_recastnavigation_RecastAPI_nativeDestroyNavMesh
+    (JNIEnv*, jclass, jlong navMesh)
+{
+    if (navMesh > 0)
+        navDestroyNavMesh(reinterpret_cast<dtNavMesh*>(navMesh));
+}
+extern "C" JNIEXPORT void JNICALL JavaCritical_recastnavigation_RecastAPI_nativeDestroyNavMesh
+    (jlong navMesh)
+{
+    if (navMesh > 0)
+        navDestroyNavMesh(reinterpret_cast<dtNavMesh*>(navMesh));
+}
