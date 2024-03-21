@@ -3322,7 +3322,7 @@ extern "C" NavStatus navCreateNavMesh(const dtNavMeshParams* params, dtNavMesh**
     if (!mem)
         return -3;
     dtNavMesh* const navMesh = new(mem) dtNavMesh;
-    dtStatus s = navMesh->init(params);
+    const dtStatus s = navMesh->init(params);
     if (dtStatusFailed(s))
     {
         navMesh->~dtNavMesh();
@@ -3339,6 +3339,29 @@ extern "C" void navDestroyNavMesh(dtNavMesh* navMesh)
         return;
     navMesh->~dtNavMesh();
     dtFree(navMesh);
+}
+
+extern "C" NavStatus navDumpNavMesh(const dtNavMesh* navMesh, FILE* fp)
+{
+    if (!navMesh)
+        return -1;
+    if (!fp)
+        return -2;
+
+    int64_t r = 0;
+    for (int i = 0, n = navMesh->getMaxTiles(); i < n; i++)
+    {
+        const dtMeshTile* const tile = navMesh->getTile(i);
+        if (tile && tile->header)
+        {
+            if (fwrite(&tile->dataSize, sizeof(tile->dataSize), 1, fp) != 1)
+                return -3;
+            if (fwrite(tile->data, 1, static_cast<size_t>(tile->dataSize), fp) != static_cast<size_t>(tile->dataSize))
+                return -4;
+            r++;
+        }
+    }
+    return r;
 }
 
 #ifdef _MSC_VER
