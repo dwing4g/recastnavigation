@@ -1151,7 +1151,7 @@ extern "C" void navBuildTileEnd(dtNavMeshEx* navMesh, int tileX, int tileZ)
     tileCtx->freeMesh();
 }
 
-extern "C" NavStatus navReplaceTile(dtNavMeshEx* navMesh, unsigned char* navTileData, int navTileDataSize)
+extern "C" NavStatus navReplaceTile(dtNavMesh* navMesh, unsigned char* navTileData, int navTileDataSize)
 {
     if (!navMesh)
         return -1;
@@ -1174,7 +1174,7 @@ extern "C" NavStatus navReplaceTile(dtNavMeshEx* navMesh, unsigned char* navTile
     return 0;
 }
 
-extern "C" NavStatus navRemoveTile(dtNavMeshEx* navMesh, int tileX, int tileZ)
+extern "C" NavStatus navRemoveTile(dtNavMesh* navMesh, int tileX, int tileZ)
 {
     if (!navMesh)
         return -1;
@@ -1201,7 +1201,7 @@ extern "C" NavStatus navFixTile(const dtNavMeshEx* navMesh, const void* buildPar
     return r + fixNavMeshTileInvalidPoly(tile->data);
 }
 
-extern "C" NavStatus navGetTileData(const dtNavMeshEx* navMesh, int tileX, int tileZ, const dtMeshTile** tilePtr)
+extern "C" NavStatus navGetTileData(const dtNavMesh* navMesh, int tileX, int tileZ, const dtMeshTile** tilePtr)
 {
     if (!tilePtr)
         return -1;
@@ -1215,7 +1215,7 @@ extern "C" NavStatus navGetTileData(const dtNavMeshEx* navMesh, int tileX, int t
     return tile ? 0 : -3;
 }
 
-extern "C" NavStatus navAllocNavQuery(const dtNavMeshEx* navMesh, int maxNodes, dtNavMeshQueryEx** outNavQuery)
+extern "C" NavStatus navAllocNavQuery(const dtNavMesh* navMesh, int maxNodes, dtNavMeshQueryEx** outNavQuery)
 {
     if (!navMesh)
         return -1;

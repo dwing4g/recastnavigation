@@ -189,7 +189,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeReplace
         return -101;
     if (navTileData <= 0)
         return -102;
-    const NavStatus s = navReplaceTile(reinterpret_cast<dtNavMeshEx*>(navMesh), reinterpret_cast<unsigned char*>(navTileData), navTileDataSize);
+    const NavStatus s = navReplaceTile(reinterpret_cast<dtNavMesh*>(navMesh), reinterpret_cast<unsigned char*>(navTileData), navTileDataSize);
     return static_cast<jlong>(s);
 }
 
@@ -199,7 +199,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeRemoveT
 {
     if (navMesh <= 0)
         return -101;
-    const NavStatus s = navRemoveTile(reinterpret_cast<dtNavMeshEx*>(navMesh), tileX, tileZ);
+    const NavStatus s = navRemoveTile(reinterpret_cast<dtNavMesh*>(navMesh), tileX, tileZ);
     return static_cast<jlong>(s);
 }
 
@@ -222,7 +222,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeGetTile
     if (navMesh <= 0)
         return -101;
     const dtMeshTile* dataPtr = 0;
-    const NavStatus s = navGetTileData(reinterpret_cast<const dtNavMeshEx*>(navMesh), tileX, tileZ, &dataPtr);
+    const NavStatus s = navGetTileData(reinterpret_cast<const dtNavMesh*>(navMesh), tileX, tileZ, &dataPtr);
     return s < 0 ? s : reinterpret_cast<jlong>(dataPtr);
 }
 
@@ -232,7 +232,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeAllocNa
     if (navMesh <= 0)
         return -101;
     dtNavMeshQueryEx* navQuery = 0;
-    const NavStatus s = navAllocNavQuery(reinterpret_cast<const dtNavMeshEx*>(navMesh), maxNodes, &navQuery);
+    const NavStatus s = navAllocNavQuery(reinterpret_cast<const dtNavMesh*>(navMesh), maxNodes, &navQuery);
     return s < 0 ? static_cast<jlong>(s) : reinterpret_cast<jlong>(navQuery);
 }
 extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativeAllocNavQuery(jlong navMesh, jint maxNodes)
@@ -240,7 +240,7 @@ extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativ
     if (navMesh <= 0)
         return -101;
     dtNavMeshQueryEx* navQuery = 0;
-    const NavStatus s = navAllocNavQuery(reinterpret_cast<const dtNavMeshEx*>(navMesh), maxNodes, &navQuery);
+    const NavStatus s = navAllocNavQuery(reinterpret_cast<const dtNavMesh*>(navMesh), maxNodes, &navQuery);
     return s < 0 ? static_cast<jlong>(s) : reinterpret_cast<jlong>(navQuery);
 }
 

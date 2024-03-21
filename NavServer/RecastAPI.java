@@ -318,8 +318,8 @@ public final class RecastAPI {
 	 * 根据dtNavMeshCreateParams中的数据构建NavMesh数据
 	 *
 	 * @param navMeshCreateParams 传入指向dtNavMeshCreateParams数据的指针
-	 * @param navMeshDataSize     长度至少为1,索引0的位置输出构建结果的NavMesh数据字节大小
-	 * @return navTileData 构建结果的NavMesh数据指针. <0表示失败, 0表示构建出空数据
+	 * @param navMeshDataSize     长度至少为1,索引0的位置输出构建结果的NavMesh数据字节大小,只有构建成功时有效
+	 * @return 构建结果的NavMesh数据指针. <0表示失败, 0表示构建出空数据
 	 */
 	public static native long nativeBuildNavMesh(long navMeshCreateParams, int[] navMeshDataSize);
 
