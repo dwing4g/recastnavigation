@@ -10,6 +10,7 @@ local write = io.write
 local clock = os.clock
 local arg = {...}
 local _G = _G
+local DT_POLYREF64 = false
 
 local ffi = require "ffi"
 ffi.cdef[[
@@ -243,17 +244,31 @@ for i = 0, tileCount - 1 do
 		A() o("    links: dtLink[%d]", _G.maxLinkCount)
 		for j = 0, _G.maxLinkCount - 1 do
 			A() o("      dtLink[%d/%d]", j, _G.maxLinkCount)
-			a() O("        dtLink.ref : %d", readUInt("ref"))
 			local salt, tile, poly, tileX, tileZ
-			if _G.ref > 0 then
-				salt = floor(_G.ref / (2^22))
-				tile = floor(_G.ref / polyN) % tileN
-				poly = _G.ref % polyN
-				tileX = tile % tileW
-				tileZ = floor(tile / tileW)
-				o(" -- salt:%d, tile:%d(%d,%d), poly:%d", salt, tile, tileX, tileZ, poly)
+			if DT_POLYREF64 then
+				a() O("        dtLink.ref : %d, %d", readUInt("ref0"), readUInt("ref1"))
+				if _G.ref0 > 0 or _G.ref1 > 0 then
+					salt = floor(_G.ref1 / (2^16))
+					tile = _G.ref1 % (2^16) * (2^12) + floor(_G.ref0 / (2^20))
+					poly = _G.ref0 % (2^20)
+					tileX = tile % tileW
+					tileZ = floor(tile / tileW)
+					o(" -- salt:%d, tile:%d(%d,%d), poly:%d", salt, tile, tileX, tileZ, poly)
+				else
+					o ""
+				end
 			else
-				o ""
+				a() O("        dtLink.ref : %d", readUInt("ref"))
+				if _G.ref > 0 then
+					salt = floor(_G.ref / (2^22))
+					tile = floor(_G.ref / polyN) % tileN
+					poly = _G.ref % polyN
+					tileX = tile % tileW
+					tileZ = floor(tile / tileW)
+					o(" -- salt:%d, tile:%d(%d,%d), poly:%d", salt, tile, tileX, tileZ, poly)
+				else
+					o ""
+				end
 			end
 			a() o("        dtLink.next: %d", readInt("next"))
 			a() o("        dtLink.edge: %d", readByte())
