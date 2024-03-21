@@ -304,6 +304,12 @@ NavStatus navCreateNavMesh(const dtNavMeshParams* params, dtNavMesh** outNavMesh
 /// @param navMesh 传入有效的dtNavMesh指针
 void navDestroyNavMesh(dtNavMesh* navMesh);
 
+/// 保存指定navMesh数据到指定文件中
+/// @param navMesh 通过navLoadNavMesh或navForkNavMesh或navCreateNavMesh得到的有效指针
+/// @param fp 输出文件. 必须用二进制可写模式打开, 此方法不负责关闭文件
+/// @return 保存tile的数量. >=0表示保存成功, <0表示保存失败
+NavStatus navDumpNavMesh(const dtNavMesh* navMesh, FILE* fp);
+
 #ifdef __cplusplus
 }
 #endif
