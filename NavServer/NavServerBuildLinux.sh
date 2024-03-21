@@ -38,8 +38,8 @@ NavServerTest.cpp \
 "
 
 # for C++11
-COMPILE="g++ -std=c++11 -DNDEBUG -D__STDC_LIMIT_MACROS -I. -I../Detour/Include -I../Recast/Include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -m64 -O3 -fPIC -pipe -Wall"
-# COMPILE="g++ -std=c++0x -DNDEBUG -D__STDC_LIMIT_MACROS -Dconstexpr=const -I. -I../Detour/Include -I../Recast/Include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -m64 -O3 -fPIC -pipe -Wall"
+COMPILE="g++ -std=c++11 -DDT_POLYREF64=1 -DNDEBUG -D__STDC_LIMIT_MACROS -I. -I../Detour/Include -I../Recast/Include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -m64 -O3 -fPIC -pipe -Wall"
+# COMPILE="g++ -std=c++0x -DDT_POLYREF64=1 -DNDEBUG -D__STDC_LIMIT_MACROS -Dconstexpr=const -I. -I../Detour/Include -I../Recast/Include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -m64 -O3 -fPIC -pipe -Wall"
 
 echo building librecastjni64.so ...
 $COMPILE -shared -fvisibility=hidden -Wl,-soname -Wl,librecastjni64.so -o librecastjni64.so $COMMON_FILES $SO_FILES
