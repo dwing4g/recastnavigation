@@ -4,8 +4,8 @@ cd `dirname $0`
 
 if [ -z $JAVA_HOME ]; then JAVA_HOME=/usr/java/default; fi
 
-JAVA_VER=`$JAVA_HOME/bin/java -version 2>&1 | awk -F "[ \"]" '/version/{print $4}'`
-if [[ $JAVA_VER < 1.8 ]]; then echo 'ERROR: JDK 1.8 or later is required!'; exit 1; fi
+JAVA_VER=$($JAVA_HOME/bin/java -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{sub("^$", "0", $2); print $1$2}')
+if [[ "$JAVA_VER" -le 18 ]]; then echo 'ERROR: JDK 1.8 or later is required!'; exit 1; fi
 
 COMMON_FILES="\
 ../Detour/Source/DetourAlloc.cpp \
