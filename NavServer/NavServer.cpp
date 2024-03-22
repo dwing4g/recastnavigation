@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include "DetourMath.h" // fix 'isfinite' for linux gcc 4.8.5
 #include <new>
 #include <vector>
 #include <deque>
