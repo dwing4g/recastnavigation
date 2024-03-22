@@ -361,6 +361,62 @@ protected:
 
 int main(int argc, const char** argv)
 {
+    navInit();
+    FILE* fp = fopen("~$dump.navmeshes", "rb");
+    if (!fp)
+    {
+        printf("ERR1");
+        return 0;
+    }
+    fseek(fp, 0, SEEK_END);
+    int size = (int)ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    unsigned char* buf = new unsigned char[size];
+    fread(buf, 1, size, fp);
+    fclose(fp);
+    dtNavMeshParams params;
+    memset(&params, 0, sizeof(params));
+    params.tileWidth = 16;
+    params.tileHeight = 16;
+    params.maxTiles = 512 * 512;
+    params.maxPolys = 0x7fff;
+    dtNavMesh* navMesh;
+    NavStatus r = navCreateNavMesh(&params, &navMesh);
+    if (r != 0)
+    {
+        printf("ERR2 %lld", (long long)r);
+        return 0;
+    }
+    for (int i = 0; i < size;)
+    {
+        int len = *(int*)(buf + i);
+        navReplaceTile(navMesh, buf + i + 4, len);
+        i += 4 + len;
+    }
+    dtNavMeshQueryEx* navQuery;
+    r = navAllocNavQuery(navMesh, 4096, &navQuery);
+    if (r != 0)
+    {
+        printf("ERR3 %lld", (long long)r);
+        return 0;
+    }
+    float sp[3] = { 4960 + 87, 300, 4480 + 20 };
+    float tp[3] = { 4960 + 135, 300, 4480 + 20 };
+    float poses[1024 * 3];
+    r = navFindPath(navQuery, sp, tp, poses, 0, 1024, false);
+    if (r < 0)
+    {
+        printf("ERR4 %lld", (long long)r);
+        return 0;
+    }
+    for (int i = 0; i < r; i++)
+        printf("%3d: %f, %f, %f,\n", i, poses[i*3], poses[i*3+1], poses[i*3+2]);
+    printf("end");
+    return 0;
+}
+
+int main2(int argc, const char** argv)
+{
     const char* serverMapRootPath = "ark_resource/resource/develop/server";
     char serverMapRootDir[512];
     for (int i = 0;; i++)
