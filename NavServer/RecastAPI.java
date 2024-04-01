@@ -65,7 +65,7 @@ public final class RecastAPI {
 	/**
 	 * 复制指定的navmesh. 其中包括整张地图所有tile的导航网格数据
 	 *
-	 * @param navMesh 用于复制的源navmesh
+	 * @param navMesh 用于复制的源navmesh. 通过nativeLoadNavMesh或nativeForkNavMesh加载得到的
 	 * @return dtNavMesh结构的指针. <=0表示失败, 成功后通过nativeFreeNavMesh来释放
 	 */
 	public static native long nativeForkNavMesh(long navMesh);
@@ -327,7 +327,7 @@ public final class RecastAPI {
 	 * 根据dtNavMeshParams中的配置创建一个空的dtNavMesh
 	 *
 	 * @param navMeshParams 传入指向dtNavMeshParams数据的指针
-	 * @return 输出创建的dtNavMesh指针. <0表示创建失败
+	 * @return 输出创建的dtNavMesh指针. <=0表示创建失败
 	 */
 	public static native long nativeCreateNavMesh(long navMeshParams);
 
