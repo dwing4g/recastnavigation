@@ -95,7 +95,7 @@ void navFree(void* ptr);
 NavStatus navLoadNavMesh(FILE* fp, dtNavMeshEx** outNavMesh);
 
 /// 复制指定的navmesh. 其中包括整张地图所有tile的导航网格数据
-/// @param navMesh 用于复制的源navmesh
+/// @param navMesh 用于复制的源navmesh. 通过navLoadNavMesh或navForkNavMesh加载得到的
 /// @param outNavMesh 输出的dtNavMeshEx结构指针. 加载成功后通过navFreeNavMesh来释放此指针
 /// @return 加载结果的状态. 0表示成功,<0表示失败
 NavStatus navForkNavMesh(const dtNavMeshEx* navMesh, dtNavMeshEx** outNavMesh);
