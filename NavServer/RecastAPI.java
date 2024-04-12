@@ -339,7 +339,7 @@ public final class RecastAPI {
 	public static native void nativeDestroyNavMesh(long navMesh);
 
 	/**
-	 * 保存指定navMesh数据到指定文件中
+	 * 保存指定navMesh数据到指定文件中. 对navMesh是读操作(读读并发,读写和写写不能并发)
 	 *
 	 * @param navMesh  通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
 	 * @param filename 输出文件名
@@ -350,7 +350,11 @@ public final class RecastAPI {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	static {
-		loadNativeLib(RecastAPI.class.getClassLoader(), null, "recastjni");
+		String recastApiLib = System.getProperty("RecastAPI.lib");
+		if (recastApiLib != null)
+			System.load(new File(recastApiLib).getAbsolutePath());
+		else
+			loadNativeLib(RecastAPI.class.getClassLoader(), null, "recastjni");
 		if (!nativeInit())
 			throw new Error("RecastAPI init failed");
 	}
