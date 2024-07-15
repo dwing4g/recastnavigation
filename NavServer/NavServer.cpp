@@ -1407,6 +1407,14 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
 #else
     dtPolyRef resPolys[maxPosCount];
 #endif
+	if (!dtVisfinite(sp))
+		return -11;
+	if (!dtVisfinite(p))
+		return -12;
+	if (rh.pathCount <= 0)
+		return -13;
+	if (!polys[0])
+		return -14;
     int posCount = 0;
     s = navQuery->findStraightPath(sp, p, polys, rh.pathCount, outFloatBuf, 0, resPolys, &posCount, maxPosCount, DT_STRAIGHTPATH_AREA_CROSSINGS);
     if (dtStatusFailed(s))
