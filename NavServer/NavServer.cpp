@@ -1364,7 +1364,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
             s = navQuery->closestPointOnPolyBoundary(rh.pathCount > 0 ? polys[rh.pathCount - 1] : sRef, p, p);
             if (dtStatusFailed(s))
                 return NAVSTATUS_HIGH_BIT | 2LL << 32 | s;
-            if (maxPosCount == 1 || maxPosCount > 1 && rh.pathCount <= 0) // 有碰撞但只需终点
+            if (maxPosCount == 1 || (maxPosCount > 1 && rh.pathCount <= 0)) // 有碰撞但只需终点
             {
                 dtVcopy(outFloatBuf, p);
                 return 1;
@@ -1372,7 +1372,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
             if (maxPosCount <= 0) // 直接返回有碰撞
                 return 1;
         }
-        else if (maxPosCount == 1 || maxPosCount > 1 && rh.pathCount <= 0) // 没碰撞但只需终点
+        else if (maxPosCount == 1 || (maxPosCount > 1 && rh.pathCount <= 0)) // 没碰撞但只需终点
         {
             s = navQuery->closestPointOnPoly(rh.pathCount > 0 ? polys[rh.pathCount - 1] : sRef, tp, outFloatBuf, 0);
             if (dtStatusFailed(s))
