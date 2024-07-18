@@ -166,7 +166,7 @@ public:
         const int tileCount = tw * th;
         tiles = static_cast<TileCtx*>(dtAlloc(sizeof(TileCtx) * tileCount, DT_ALLOC_PERM));
         if (!tiles)
-            return DT_FAILURE | DT_OUT_OF_MEMORY;
+            return DT_FAILURE | DT_OUT_OF_MEMORY | (255u << 16);
         for (int i = 0; i < tileCount; ++i)
             new(tiles + i) TileCtx;
         return s;

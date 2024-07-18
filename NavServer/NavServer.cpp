@@ -1364,7 +1364,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
             s = navQuery->closestPointOnPolyBoundary(rh.pathCount > 0 ? polys[rh.pathCount - 1] : sRef, p, p);
             if (dtStatusFailed(s))
                 return NAVSTATUS_HIGH_BIT | 2LL << 32 | s;
-            if (maxPosCount == 1) // 有碰撞但只需终点
+            if (maxPosCount == 1 || maxPosCount > 1 && rh.pathCount <= 0) // 有碰撞但只需终点
             {
                 dtVcopy(outFloatBuf, p);
                 return 1;
@@ -1372,7 +1372,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
             if (maxPosCount <= 0) // 直接返回有碰撞
                 return 1;
         }
-        else if (maxPosCount == 1) // 没碰撞但只需终点
+        else if (maxPosCount == 1 || maxPosCount > 1 && rh.pathCount <= 0) // 没碰撞但只需终点
         {
             s = navQuery->closestPointOnPoly(rh.pathCount > 0 ? polys[rh.pathCount - 1] : sRef, tp, outFloatBuf, 0);
             if (dtStatusFailed(s))
@@ -1394,7 +1394,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
                 return NAVSTATUS_HIGH_BIT | 4LL << 32 | s;
             if (!tRef)
                 return -9; // invalid target pos
-            s = navQuery->findPath(sRef, tRef, sp, tp, navQuery, polys, &rh.pathCount, FIND_PATH_MAX_POLYS);
+            s = navQuery->findPath(sRef, tRef, np, tp, navQuery, polys, &rh.pathCount, FIND_PATH_MAX_POLYS);
             if (dtStatusFailed(s))
                 return NAVSTATUS_HIGH_BIT | 5LL << 32 | s;
         }
@@ -1407,16 +1407,16 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
 #else
     dtPolyRef resPolys[maxPosCount];
 #endif
-	if (!dtVisfinite(sp))
-		return -11;
-	if (!dtVisfinite(p))
-		return -12;
-	if (rh.pathCount <= 0)
-		return -13;
-	if (!polys[0])
-		return -14;
+    if (!dtVisfinite(np))
+        return -11;
+    if (!dtVisfinite(p))
+        return -12;
+    if (rh.pathCount <= 0)
+        return -13;
+    if (!polys[0])
+        return -14;
     int posCount = 0;
-    s = navQuery->findStraightPath(sp, p, polys, rh.pathCount, outFloatBuf, 0, resPolys, &posCount, maxPosCount, DT_STRAIGHTPATH_AREA_CROSSINGS);
+    s = navQuery->findStraightPath(np, p, polys, rh.pathCount, outFloatBuf, 0, resPolys, &posCount, maxPosCount, DT_STRAIGHTPATH_AREA_CROSSINGS);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | 6LL << 32 | s;
     const dtNavMesh& navMesh = *navQuery->getAttachedNavMesh();
@@ -1481,7 +1481,7 @@ inline static dtStatus findPath(const dtNavMeshQueryEx& navQuery, dtPolyRef star
     std::function<bool(dtPolyRef, dtPolyRef, const float*, const float*)> canPass)
 {
     if (!pathCount)
-        return DT_FAILURE | DT_INVALID_PARAM;
+        return DT_FAILURE | DT_INVALID_PARAM | (201u << 16);
     *pathCount = 0;
 
     const dtNavMesh* navMesh = navQuery.getAttachedNavMesh();
@@ -1489,7 +1489,7 @@ inline static dtStatus findPath(const dtNavMeshQueryEx& navQuery, dtPolyRef star
     dtNodeQueue& openList = navQuery.getOpenList();
     if (!navMesh || !nodePool || !navMesh->isValidPolyRef(startRef) || !navMesh->isValidPolyRef(endRef) ||
         !startPos || !dtVisfinite(startPos) || !endPos || !dtVisfinite(endPos) || !path)
-        return DT_FAILURE | DT_INVALID_PARAM;
+        return DT_FAILURE | DT_INVALID_PARAM | (202u << 16);
 
     if (startRef == endRef)
     {
@@ -2353,7 +2353,7 @@ dtStatus getPortalPoints(dtPolyRef from, const dtPoly* fromPoly, const dtMeshTil
         }
     }
     if (!link)
-        return DT_FAILURE | DT_INVALID_PARAM;
+        return DT_FAILURE | DT_INVALID_PARAM | (203u << 16);
 
     // Handle off-mesh connections.
     if (fromPoly->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)
@@ -2369,7 +2369,7 @@ dtStatus getPortalPoints(dtPolyRef from, const dtPoly* fromPoly, const dtMeshTil
                 return DT_SUCCESS;
             }
         }
-        return DT_FAILURE | DT_INVALID_PARAM;
+        return DT_FAILURE | DT_INVALID_PARAM | (204u << 16);
     }
 
     if (toPoly->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)
@@ -2384,7 +2384,7 @@ dtStatus getPortalPoints(dtPolyRef from, const dtPoly* fromPoly, const dtMeshTil
                 return DT_SUCCESS;
             }
         }
-        return DT_FAILURE | DT_INVALID_PARAM;
+        return DT_FAILURE | DT_INVALID_PARAM | (205u << 16);
     }
 
     // Find portal vertices.
