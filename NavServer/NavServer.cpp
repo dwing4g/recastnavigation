@@ -1223,14 +1223,19 @@ extern "C" NavStatus navAllocNavQuery(const dtNavMesh* navMesh, int maxNodes, dt
         return -1;
     if (!outNavQuery)
         return -2;
-    void* const mem = dtAlloc(sizeof(dtNavMeshQueryEx), DT_ALLOC_PERM);
-    if (!mem)
-        return -3;
-    dtNavMeshQueryEx* const navQuery = new(mem) dtNavMeshQueryEx(maxNodes);
+    dtNavMeshQueryEx* navQuery = *outNavQuery;
+    if (!navQuery)
+    {
+        void* const mem = dtAlloc(sizeof(dtNavMeshQueryEx), DT_ALLOC_PERM);
+        if (!mem)
+            return -3;
+        navQuery = new(mem) dtNavMeshQueryEx(maxNodes);
+    }
     const dtStatus s = navQuery->init(navMesh, maxNodes);
     if (dtStatusFailed(s))
     {
-        navFreeNavQuery(navQuery);
+        if (!*outNavQuery)
+            navFreeNavQuery(navQuery);
         return NAVSTATUS_HIGH_BIT | s;
     }
     *outNavQuery = navQuery;
