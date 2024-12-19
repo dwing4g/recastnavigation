@@ -244,6 +244,24 @@ extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativ
     return s < 0 ? static_cast<jlong>(s) : reinterpret_cast<jlong>(navQuery);
 }
 
+// public static native long nativeReallocNavQuery(long navQuery, long navMesh, int maxNodes);
+extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeReallocNavQuery(JNIEnv*, jclass, jlong navQuery, jlong navMesh, jint maxNodes)
+{
+    if (navMesh <= 0)
+        return -101;
+    dtNavMeshQueryEx* pNavQuery = reinterpret_cast<dtNavMeshQueryEx*>(navQuery);
+    const NavStatus s = navAllocNavQuery(reinterpret_cast<const dtNavMesh*>(navMesh), maxNodes, &pNavQuery);
+    return s < 0 ? static_cast<jlong>(s) : reinterpret_cast<jlong>(pNavQuery);
+}
+extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativeReallocNavQuery(jlong navQuery, jlong navMesh, jint maxNodes)
+{
+    if (navMesh <= 0)
+        return -101;
+    dtNavMeshQueryEx* pNavQuery = reinterpret_cast<dtNavMeshQueryEx*>(navQuery);
+    const NavStatus s = navAllocNavQuery(reinterpret_cast<const dtNavMesh*>(navMesh), maxNodes, &pNavQuery);
+    return s < 0 ? static_cast<jlong>(s) : reinterpret_cast<jlong>(pNavQuery);
+}
+
 // public static native void nativeFreeNavQuery(long navQuery);
 extern "C" JNIEXPORT void JNICALL Java_recastnavigation_RecastAPI_nativeFreeNavQuery(JNIEnv*, jclass, jlong navQuery)
 {

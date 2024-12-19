@@ -174,6 +174,16 @@ public final class RecastAPI {
 	public static native long nativeAllocNavQuery(long navMesh, int maxNodes);
 
 	/**
+	 * 用现有的navQuery指针绑定某个navMesh. 同一navQuery不能并发,对绑定的navMesh是只读操作(读读并发,读写和写写不能并发)
+	 *
+	 * @param navQuery 复用的dtNavMeshQueryEx结构的指针. 如果为0则效果同nativeAllocNavQuery
+	 * @param navMesh  通过nativeLoadNavMesh或nativeForkNavMesh或nativeCreateNavMesh得到的有效指针
+	 * @param maxNodes 最大的搜索节点数量. 必须在(0,65535]的范围内
+	 * @return dtNavMeshQueryEx结构的指针, <=0表示失败
+	 */
+	public static native long nativeReallocNavQuery(long navQuery, long navMesh, int maxNodes);
+
+	/**
 	 * 释放某个navQuery指针
 	 *
 	 * @param navQuery 通过nativeAllocNavQuery得到的有效指针
