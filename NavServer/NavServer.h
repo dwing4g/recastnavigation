@@ -178,7 +178,7 @@ NavStatus navGetTileData(const dtNavMesh* navMesh, int tileX, int tileZ, const d
 /// 分配绑定某个navMesh的dtNavMeshQueryEx结构指针. 此方法是线程安全的,但获得的指针后续不能并发访问
 /// @param navMesh 通过navLoadNavMesh或navForkNavMesh或navCreateNavMesh得到的有效指针
 /// @param maxNodes 最大的搜索节点数量. 必须在(0,65535]的范围内
-/// @param outNavQuery 输出dtNavMeshQueryEx结构的指针
+/// @param outNavQuery 输出dtNavMeshQueryEx结构的指针. 如果指向非空指针,则可以复用dtNavMeshQueryEx
 /// @return 分配结果的状态. 0表示成功; <0表示失败
 NavStatus navAllocNavQuery(const dtNavMesh* navMesh, int maxNodes, dtNavMeshQueryEx** outNavQuery);
 
