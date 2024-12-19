@@ -393,7 +393,7 @@ int main(int argc, const char** argv)
         navReplaceTile(navMesh, buf + i + 4, len);
         i += 4 + len;
     }
-    dtNavMeshQueryEx* navQuery;
+    dtNavMeshQueryEx* navQuery = 0;
     r = navAllocNavQuery(navMesh, 4096, &navQuery);
     if (r != 0)
     {
@@ -492,7 +492,7 @@ int main2(int argc, const char** argv)
     // traceNavMesh(*static_cast<dtNavMesh*>(navMesh));
 
     resetTimer();
-    dtNavMeshQueryEx* navQuery;
+    dtNavMeshQueryEx* navQuery = 0;
     s = navAllocNavQuery(navMesh, 65535, &navQuery);
     if (s)
     {
