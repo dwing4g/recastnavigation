@@ -1758,14 +1758,32 @@ public:
     UnCopyable() {}
 };
 
+struct PolyRefPair
+{
+    const dtPolyRef a, b;
+    PolyRefPair(dtPolyRef a, dtPolyRef b) : a(a), b(b) {}
+    bool operator==(const PolyRefPair& p) const { return a == p.a && b == p.b; }
+};
+
+namespace std
+{
+    template<> struct hash<PolyRefPair>
+    {
+        size_t operator()(const PolyRefPair& p) const
+        {
+#ifdef DT_POLYREF64
+            return static_cast<size_t>(p.a ^ p.b);
+#else
+            return (static_cast<size_t>(p.a) << 32) ^ static_cast<size_t>(p.b);
+#endif
+        }
+    };
+}
+
 class NavFieldCtx : private UnCopyable
 {
-    std::unordered_map<uint64_t, bool> linkResCache; // key的高位是dtPolyRef(from),低位是dtPolyRef(to); value是能否通过
+    std::unordered_map<PolyRefPair, bool> linkResCache; // key的高位是dtPolyRef(from),低位是dtPolyRef(to); value是能否通过
 
-    static uint64_t toLinkKey(dtPolyRef fromRef, dtPolyRef toRef)
-    {
-        return (static_cast<uint64_t>(fromRef) << 32) + static_cast<uint64_t>(toRef);
-    }
 public:
     virtual ~NavFieldCtx() {}
     virtual void getCenter(float& cx, float& cz) const = 0;
@@ -1776,7 +1794,7 @@ public:
     virtual bool fixLine(const dtNavMeshQueryEx* navQuery, const float* posFrom, float* posTo) const = 0;
     bool tryGetLinkResCache(dtPolyRef fromRef, dtPolyRef toRef, bool& res) const
     {
-        auto it = linkResCache.find(toLinkKey(fromRef, toRef));
+        auto it = linkResCache.find(PolyRefPair(fromRef, toRef));
         if (it == linkResCache.end())
             return false;
         res = it->second;
@@ -1784,7 +1802,7 @@ public:
     }
     void addLinkResCache(dtPolyRef fromRef, dtPolyRef toRef, bool res)
     {
-        linkResCache[toLinkKey(fromRef, toRef)] = res;
+        linkResCache[PolyRefPair(fromRef, toRef)] = res;
     }
     bool findPos(const dtNavMeshQueryEx* navQuery, float* pos) const
     {
