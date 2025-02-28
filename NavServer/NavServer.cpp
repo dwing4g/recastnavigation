@@ -1772,11 +1772,15 @@ namespace std
         size_t operator()(const PolyRefPair& p) const
         {
 #ifdef DT_POLYREF64
-            return static_cast<size_t>(p.a ^ p.b);
+            return static_cast<size_t>((((p.a ^ (p.a >> 32)) * C0)
+                                      ^ ((p.b ^ (p.b >> 32)) * C1)) >> 32);
 #else
-            return (static_cast<size_t>(p.a) << 32) ^ static_cast<size_t>(p.b);
+            return static_cast<size_t>(((p.a * C0) ^ (p.b * C1)) >> 32);
 #endif
         }
+    private:
+        static const uint64_t C0 = 0x65d200ce55b19ad8L;
+        static const uint64_t C1 = 0x4f2162926e40c299L;
     };
 }
 
