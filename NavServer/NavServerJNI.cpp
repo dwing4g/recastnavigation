@@ -410,29 +410,29 @@ extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeFindPat
     return static_cast<jlong>(s);
 }
 
-// public static native long nativeFindPos(long navQuery, float x, float y, float z, long floatBuf);
+// public static native long nativeFindPos(long navQuery, float x, float y, float z, long floatBuf, int method);
 extern "C" JNIEXPORT jlong JNICALL Java_recastnavigation_RecastAPI_nativeFindPos
-    (JNIEnv*, jclass, jlong navQuery, jfloat x, jfloat y, jfloat z, jlong floatBuf)
+    (JNIEnv*, jclass, jlong navQuery, jfloat x, jfloat y, jfloat z, jlong floatBuf, jint method)
 {
     if (navQuery <= 0)
         return -101;
     if (floatBuf < 0)
         return -102;
     float p[3] = { x, y, z };
-    const NavStatus s = navFindPos(reinterpret_cast<const dtNavMeshQueryEx*>(navQuery), p);
+    const NavStatus s = navFindPos(reinterpret_cast<const dtNavMeshQueryEx*>(navQuery), p, method);
     if (floatBuf > 0)
         memcpy(reinterpret_cast<float*>(floatBuf), p, sizeof(p));
     return static_cast<jlong>(s);
 }
 extern "C" JNIEXPORT jlong JNICALL JavaCritical_recastnavigation_RecastAPI_nativeFindPos
-    (jlong navQuery, jfloat x, jfloat y, jfloat z, jlong floatBuf)
+    (jlong navQuery, jfloat x, jfloat y, jfloat z, jlong floatBuf, jint method)
 {
     if (navQuery <= 0)
         return -101;
     if (floatBuf < 0)
         return -102;
     float p[3] = { x, y, z };
-    const NavStatus s = navFindPos(reinterpret_cast<const dtNavMeshQueryEx*>(navQuery), p);
+    const NavStatus s = navFindPos(reinterpret_cast<const dtNavMeshQueryEx*>(navQuery), p, method);
     if (floatBuf > 0)
         memcpy(reinterpret_cast<float*>(floatBuf), p, sizeof(p));
     return static_cast<jlong>(s);

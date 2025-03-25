@@ -237,7 +237,7 @@ public:
     explicit dtNavMeshQueryEx(int maxNodes) : openList(maxNodes) {}
     dtNodeQueue& getOpenList() const { return openList; }
     dtStatus findNearestPoly(const float* center, const float* halfExtents,
-        const dtQueryFilter* filter, dtPolyRef* nearestRef, float* nearestPt) const;
+        const dtQueryFilter* filter, dtPolyRef* nearestRef, float* nearestPt, int method = 0) const;
 };
 
 enum
