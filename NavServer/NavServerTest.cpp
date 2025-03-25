@@ -603,7 +603,7 @@ int main2(int argc, const char** argv)
     floatBuf[0] = -139.58017f;
     floatBuf[1] = 63.0f;
     floatBuf[2] = 53.8633f;
-    s = navFindPos(navQuery, floatBuf);
+    s = navFindPos(navQuery, floatBuf, 0);
     if (s != 0)
         printf("ERROR: navFindPos failed(0x%llX): %s\n", static_cast<long long>(s), navFileName);
     else
