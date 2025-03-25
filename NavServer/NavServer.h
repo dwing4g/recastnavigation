@@ -236,8 +236,9 @@ NavStatus navFindPathInField(const dtNavMeshQueryEx* navQuery, const float* sp, 
 /// 根据指定坐标查找位于navMesh上的最近坐标. 同一navQuery不能并发,对绑定的navMesh是只读操作(读读并发,读写和写写不能并发)
 /// @param navQuery 通过navAllocNavQuery得到的dtNavMeshQueryEx结构的指针
 /// @param p 指定的坐标指针. 指向float x,y,z. 也用于输出坐标(0表示不需要输出)
+/// @param method 寻找方式. 0:NavMesh上三维最近的点; 1:优先垂直向下的点
 /// @return 查找结果的状态. 0表示查找成功, <0表示查找失败(通常是指定的X和Z坐标离navMesh太远)
-NavStatus navFindPos(const dtNavMeshQueryEx* navQuery, float* p);
+NavStatus navFindPos(const dtNavMeshQueryEx* navQuery, float* p, int method);
 
 /// 类似navFindPos. 但限定在fieldCtx指定的区域内寻找. fieldCtx可为0表示不限制区域
 NavStatus navFindPosInField(const dtNavMeshQueryEx* navQuery, float* p, const NavFieldCtx* fieldCtx);
