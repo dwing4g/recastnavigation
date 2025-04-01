@@ -186,6 +186,13 @@ NavStatus navAllocNavQuery(const dtNavMesh* navMesh, int maxNodes, dtNavMeshQuer
 /// @param navQuery 通过navAllocNavQuery得到的dtNavMeshQueryEx结构的指针
 void navFreeNavQuery(dtNavMeshQueryEx* navQuery);
 
+/// 设置navQuery的查找范围
+/// @param navQuery 通过navAllocNavQuery得到的dtNavMeshQueryEx结构的指针
+/// @param x x轴的正负范围. 默认10
+/// @param y y轴的正负范围. 默认1000
+/// @param z z轴的正负范围. 默认10
+void navSetHalfExtents(dtNavMeshQueryEx* navQuery, float x, float y, float z);
+
 /// 设置哪些区域可以通过
 /// @param navQuery 通过navAllocNavQuery得到的dtNavMeshQueryEx结构的指针
 /// @param areaFlags 区域flags的集合. 见NavMeshPolyFlags枚举定义. 默认:0xffff
@@ -237,8 +244,9 @@ NavStatus navFindPathInField(const dtNavMeshQueryEx* navQuery, const float* sp, 
 /// @param navQuery 通过navAllocNavQuery得到的dtNavMeshQueryEx结构的指针
 /// @param p 指定的坐标指针. 指向float x,y,z. 也用于输出坐标(0表示不需要输出)
 /// @param method 寻找方式. 0:NavMesh上三维最近的点; 1:优先垂直向下的点
+/// @param xzRange 在x和z轴的正负范围内查找. <0表示使用navQuery内置的范围
 /// @return 查找结果的状态. 0表示查找成功, <0表示查找失败(通常是指定的X和Z坐标离navMesh太远)
-NavStatus navFindPos(const dtNavMeshQueryEx* navQuery, float* p, int method);
+NavStatus navFindPos(const dtNavMeshQueryEx* navQuery, float* p, int method, float xzRange);
 
 /// 类似navFindPos. 但限定在fieldCtx指定的区域内寻找. fieldCtx可为0表示不限制区域
 NavStatus navFindPosInField(const dtNavMeshQueryEx* navQuery, float* p, const NavFieldCtx* fieldCtx);

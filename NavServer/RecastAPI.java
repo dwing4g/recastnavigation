@@ -191,6 +191,16 @@ public final class RecastAPI {
 	public static native void nativeFreeNavQuery(long navQuery);
 
 	/**
+	 * 设置navQuery的查找范围
+	 *
+	 * @param navQuery 通过nativeAllocNavQuery得到的有效指针
+	 * @param x        x轴的正负范围. 默认10
+	 * @param y        y轴的正负范围. 默认1000
+	 * @param z        z轴的正负范围. 默认10
+	 */
+	public static native void nativeSetHalfExtents(long navQuery, float x, float y, float z);
+
+	/**
 	 * 设置哪些区域可以通过
 	 *
 	 * @param navQuery  通过nativeAllocNavQuery得到的有效指针
@@ -270,9 +280,22 @@ public final class RecastAPI {
 	 * @param y        指定的Y坐标
 	 * @param z        指定的Z坐标
 	 * @param floatBuf 输出坐标的指针(需要float[3]大小的空间). 如果<=0则忽略输出, 需要nativeAlloc来分配
+	 * @param method   寻找方式. 见下方METHOD_开头的枚举常量
+	 * @param xzRange  在x和z轴的正负范围内查找. <0表示使用navQuery内置的范围
 	 * @return 0表示查找成功, <0表示查找失败(通常是指定的X和Z坐标离navMesh太远)
 	 */
-	public static native long nativeFindPos(long navQuery, float x, float y, float z, long floatBuf);
+	public static native long nativeFindPos(long navQuery, float x, float y, float z, long floatBuf, int method, float xzRange);
+
+	public static final int METHOD_CLOSEST = 0; // NavMesh上三维最近的点
+	public static final int METHOD_DOWN_CLOSEST = 1; // NavMesh上优先垂直向下的最近点,其次是三维最近的点
+
+	public static long nativeFindPos(long navQuery, float x, float y, float z, long floatBuf, int method) {
+		return nativeFindPos(navQuery, x, y, z, floatBuf, method, -1);
+	}
+
+	public static long nativeFindPos(long navQuery, float x, float y, float z, long floatBuf) {
+		return nativeFindPos(navQuery, x, y, z, floatBuf, METHOD_CLOSEST, -1);
+	}
 
 	/**
 	 * 类似nativeFindPos. 但限定在fieldCtx指定的区域内寻找. fieldCtx可为0表示不限制区域

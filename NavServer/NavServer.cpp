@@ -1250,6 +1250,12 @@ extern "C" void navFreeNavQuery(dtNavMeshQueryEx* navQuery)
     dtFree(navQuery);
 }
 
+extern "C" void navSetHalfExtents(dtNavMeshQueryEx* navQuery, float x, float y, float z)
+{
+    if (navQuery)
+        navQuery->setHalfExtents(x, y, z);
+}
+
 extern "C" void navSetFindPathFlags(dtNavMeshQueryEx* navQuery, int areaFlags)
 {
     if (navQuery)
@@ -1347,13 +1353,13 @@ public:
     }
 };
 
-dtStatus dtNavMeshQueryEx::findNearestPoly(const float* center, const float* halfExtents,
+dtStatus dtNavMeshQueryEx::findNearestPoly(const float* center, const float* pHalfExtents,
     const dtQueryFilter* filter, dtPolyRef* nearestRef, float* nearestPt, int method) const
 {
     if (method == 1)
     {
         NavServerFindFloorNearestPolyQuery query(this, center);
-        const dtStatus status = queryPolygons(center, halfExtents, filter, &query);
+        const dtStatus status = queryPolygons(center, pHalfExtents, filter, &query);
         if (dtStatusFailed(status))
             return status;
         const dtPolyRef bestRef = query.nearestRef();
@@ -1365,7 +1371,7 @@ dtStatus dtNavMeshQueryEx::findNearestPoly(const float* center, const float* hal
     }
 
     NavServerFindNearestPolyQuery query(this, center);
-    const dtStatus status = queryPolygons(center, halfExtents, filter, &query);
+    const dtStatus status = queryPolygons(center, pHalfExtents, filter, &query);
     if (dtStatusFailed(status))
         return status;
     const dtPolyRef bestRef = query.nearestRef();
@@ -1397,7 +1403,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
     dtPolyRef sRef;
     float np[3];
     rcVcopy(np, sp);
-    dtStatus s = navQuery->findNearestPoly(sp, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, np);
+    dtStatus s = navQuery->findNearestPoly(sp, navQuery->getHalfExtents(), navQuery, &sRef, np);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | s;
     if (!sRef)
@@ -1445,7 +1451,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
         if (rh.t < 1) // 有碰撞
         {
             dtPolyRef tRef;
-            s = navQuery->findNearestPoly(tp, NAV_QUERY_HALF_EXTENTS, navQuery, &tRef, 0);
+            s = navQuery->findNearestPoly(tp, navQuery->getHalfExtents(), navQuery, &tRef, 0);
             if (dtStatusFailed(s))
                 return NAVSTATUS_HIGH_BIT | 4LL << 32 | s;
             if (!tRef)
@@ -1487,7 +1493,7 @@ extern "C" NavStatus navFindPath(const dtNavMeshQueryEx* navQuery, const float* 
         if (ref)
             navQuery->closestPointOnPoly(ref, buf, buf, 0);
         else
-            navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+            navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
         if (outAreaBuf)
         {
             if (ref)
@@ -1728,7 +1734,7 @@ extern "C" NavStatus navFindPathInRange(const dtNavMeshQueryEx* navQuery, const 
     dtPolyRef sRef;
     float np[3];
     rcVcopy(np, sp);
-    dtStatus s = navQuery->findNearestPoly(sp, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, np);
+    dtStatus s = navQuery->findNearestPoly(sp, navQuery->getHalfExtents(), navQuery, &sRef, np);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | s;
     if (!sRef)
@@ -1743,7 +1749,7 @@ extern "C" NavStatus navFindPathInRange(const dtNavMeshQueryEx* navQuery, const 
     if (rh.t < 1) // 有碰撞
     {
         dtPolyRef tRef;
-        s = navQuery->findNearestPoly(tp, NAV_QUERY_HALF_EXTENTS, navQuery, &tRef, 0);
+        s = navQuery->findNearestPoly(tp, navQuery->getHalfExtents(), navQuery, &tRef, 0);
         if (dtStatusFailed(s))
             return NAVSTATUS_HIGH_BIT | 2LL << 32 | s;
         if (!tRef)
@@ -1778,7 +1784,7 @@ extern "C" NavStatus navFindPathInRange(const dtNavMeshQueryEx* navQuery, const 
         if (ref)
             navQuery->closestPointOnPoly(ref, buf, buf, 0);
         else
-            navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+            navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
     }
     if (posCount > 1) // 再验证一下结尾部分是否在范围内并做修正,在raycast成功的情况下很需要修正
     {
@@ -1791,7 +1797,7 @@ extern "C" NavStatus navFindPathInRange(const dtNavMeshQueryEx* navQuery, const 
                 {
                     calcLineCollision(buf[0], buf[2], buf[-3], buf[-1], cx, cz, radius2, buf);
                     dtPolyRef ref;
-                    navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+                    navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
                     break;
                 }
             }
@@ -1874,7 +1880,7 @@ public:
             pos[0] = cx + dx * f;
             pos[2] = cz + dz * f;
             dtPolyRef sRef = 0;
-            const dtStatus s = navQuery->findNearestPoly(pos, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, pos);
+            const dtStatus s = navQuery->findNearestPoly(pos, navQuery->getHalfExtents(), navQuery, &sRef, pos);
             if (dtStatusSucceed(s) && sRef && isPointIn(pos[0], pos[2]))
                 return true;
         }
@@ -1959,7 +1965,7 @@ public:
                     {
                         calcLineCollision(buf[0], buf[2], buf[-3], buf[-1], cx, cz, radius2, buf);
                         dtPolyRef ref;
-                        navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+                        navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
                         break;
                     }
                 }
@@ -1974,7 +1980,7 @@ public:
             return false;
         calcLineCollision(posTo[0], posTo[2], posFrom[0], posFrom[2], cx, cz, radius2, posTo);
         dtPolyRef ref;
-        navQuery->findNearestPoly(posTo, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, posTo);
+        navQuery->findNearestPoly(posTo, navQuery->getHalfExtents(), navQuery, &ref, posTo);
         return true;
     }
 };
@@ -2202,7 +2208,7 @@ public:
                         buf[1] = buf[-2] + (buf[1] - buf[-2]) * f;
                         buf[2] = buf[-1] + (buf[2] - buf[-1]) * f;
                         dtPolyRef ref;
-                        navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+                        navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
                         break;
                     }
                 }
@@ -2220,7 +2226,7 @@ public:
         posTo[1] = posFrom[1] + (posTo[1] - posFrom[1]) * f;
         posTo[2] = posFrom[2] + (posTo[2] - posFrom[2]) * f;
         dtPolyRef ref;
-        navQuery->findNearestPoly(posTo, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, posTo);
+        navQuery->findNearestPoly(posTo, navQuery->getHalfExtents(), navQuery, &ref, posTo);
         return true;
     }
 };
@@ -2280,7 +2286,7 @@ extern "C" NavStatus navFindPathInField(const dtNavMeshQueryEx* navQuery, const 
     dtPolyRef sRef;
     float np[3];
     rcVcopy(np, sp);
-    dtStatus s = navQuery->findNearestPoly(sp, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, np);
+    dtStatus s = navQuery->findNearestPoly(sp, navQuery->getHalfExtents(), navQuery, &sRef, np);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | s;
     if (!sRef)
@@ -2332,7 +2338,7 @@ extern "C" NavStatus navFindPathInField(const dtNavMeshQueryEx* navQuery, const 
         if (rh.t < 1) // 有碰撞
         {
             dtPolyRef tRef;
-            s = navQuery->findNearestPoly(tp, NAV_QUERY_HALF_EXTENTS, navQuery, &tRef, 0);
+            s = navQuery->findNearestPoly(tp, navQuery->getHalfExtents(), navQuery, &tRef, 0);
             if (dtStatusFailed(s))
                 return NAVSTATUS_HIGH_BIT | 4LL << 32 | s;
             if (!tRef)
@@ -2376,19 +2382,28 @@ extern "C" NavStatus navFindPathInField(const dtNavMeshQueryEx* navQuery, const 
         if (ref)
             navQuery->closestPointOnPoly(ref, buf, buf, 0);
         else
-            navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+            navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
     }
     return fieldCtx ? fieldCtx->fixPath(navQuery, outFloatBuf, posCount) : posCount; // 再验证一下结尾部分是否在范围内并做修正,在raycast成功的情况下很需要修正
 }
 
-extern "C" NavStatus navFindPos(const dtNavMeshQueryEx* navQuery, float* p, int method)
+extern "C" NavStatus navFindPos(const dtNavMeshQueryEx* navQuery, float* p, int method, float xzRange)
 {
     if (!navQuery)
         return -1;
     if (!p)
         return -2;
+    const float* pHalfExtents = navQuery->getHalfExtents();
+    float halfExtents[3];
+    if (xzRange >= 0)
+    {
+        halfExtents[0] = xzRange;
+        halfExtents[1] = pHalfExtents[1];
+        halfExtents[2] = xzRange;
+        pHalfExtents = halfExtents;
+    }
     dtPolyRef sRef = 0;
-    const dtStatus s = navQuery->findNearestPoly(p, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, p, method);
+    const dtStatus s = navQuery->findNearestPoly(p, pHalfExtents, navQuery, &sRef, p, method);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | s;
     if (!sRef)
@@ -2405,7 +2420,7 @@ extern "C" NavStatus navFindPosInField(const dtNavMeshQueryEx* navQuery, float* 
     if (!fieldCtx)
     {
         dtPolyRef sRef = 0;
-        const dtStatus s = navQuery->findNearestPoly(p, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, p);
+        const dtStatus s = navQuery->findNearestPoly(p, navQuery->getHalfExtents(), navQuery, &sRef, p);
         if (dtStatusFailed(s))
             return NAVSTATUS_HIGH_BIT | s;
         if (!sRef)
@@ -2501,7 +2516,7 @@ extern "C" NavStatus navFindWater(const dtNavMeshQueryEx* navQuery, const float*
         return -4;
     dtPolyRef sRef;
     static const dtQueryFilter defaultQueryFilter;
-    dtStatus s = navQuery->findNearestPoly(sp, NAV_QUERY_HALF_EXTENTS, &defaultQueryFilter, &sRef, 0);
+    dtStatus s = navQuery->findNearestPoly(sp, navQuery->getHalfExtents(), &defaultQueryFilter, &sRef, 0);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | s;
     if (!sRef)
@@ -2600,7 +2615,7 @@ extern "C" NavStatus navFindWater(const dtNavMeshQueryEx* navQuery, const float*
                     if (ref)
                         navQuery->closestPointOnPoly(ref, buf, buf, 0);
                     else
-                        navQuery->findNearestPoly(buf, NAV_QUERY_HALF_EXTENTS, navQuery, &ref, buf);
+                        navQuery->findNearestPoly(buf, navQuery->getHalfExtents(), navQuery, &ref, buf);
                 }
                 return posCount;
             }
@@ -2650,7 +2665,7 @@ extern "C" NavStatus navRandomPos(const dtNavMeshQueryEx* navQuery, float* p, fl
     if (!p)
         return -2;
     dtPolyRef sRef;
-    dtStatus s = navQuery->findNearestPoly(p, NAV_QUERY_HALF_EXTENTS, navQuery, &sRef, p);
+    dtStatus s = navQuery->findNearestPoly(p, navQuery->getHalfExtents(), navQuery, &sRef, p);
     if (dtStatusFailed(s))
         return NAVSTATUS_HIGH_BIT | s;
     if (!sRef)
