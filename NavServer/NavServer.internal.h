@@ -20,7 +20,6 @@ constexpr int RC_NAVINPUT_FILE_MAGIC_VERSION = 1;    // from RecastInputData::RC
 constexpr int MAX_TILES                      = 4096; // from PathfindingSystem.cpp
 constexpr int FIND_PATH_MAX_POLYS            = 4096; // see PathfindingSystem::MAX_POLYS
 
-constexpr float NAV_QUERY_HALF_EXTENTS[3] = { 5.f, 1000.f, 5.f };
 constexpr int BOX_TRIS[36] = { 0, 1, 2, 0, 2, 3, 1, 4, 5, 1, 5, 2, 4, 6, 7, 4, 7, 5, 6, 0, 3, 6, 3, 7, 3, 2, 5, 3, 5, 7, 6, 4, 1, 6, 1, 0 };
 
 struct BuildParam
@@ -230,12 +229,23 @@ public:
 class dtNavMeshQueryEx : public dtNavMeshQuery, public dtQueryFilter
 {
     mutable dtNodeQueue openList;
+    float halfExtents[3];
 
     dtNavMeshQueryEx(const dtNavMeshQueryEx&) = delete;
     dtNavMeshQueryEx& operator=(const dtNavMeshQueryEx&) = delete;
 public:
-    explicit dtNavMeshQueryEx(int maxNodes) : openList(maxNodes) {}
+    explicit dtNavMeshQueryEx(int maxNodes) : openList(maxNodes) {
+        halfExtents[0] = 10;
+        halfExtents[1] = 1000;
+        halfExtents[2] = 10;
+    }
     dtNodeQueue& getOpenList() const { return openList; }
+    const float* getHalfExtents() const { return halfExtents; }
+    void setHalfExtents(float x, float y, float z) {
+        halfExtents[0] = x;
+        halfExtents[1] = y;
+        halfExtents[2] = z;
+    }
     dtStatus findNearestPoly(const float* center, const float* halfExtents,
         const dtQueryFilter* filter, dtPolyRef* nearestRef, float* nearestPt, int method = 0) const;
 };
